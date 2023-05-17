@@ -1,0 +1,28 @@
+﻿@page "/Page2"
+@using System.Security.Claims
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+<h3>Page2</h3>
+<div>@_message</div>
+
+@code {
+    private string? authMessage;
+    private string? surname;
+    private IEnumerable<Claim> claims = Enumerable.Empty<Claim>();
+    private ClaimsPrincipal? _user;
+    private string? _message;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider
+            .GetAuthenticationStateAsync();
+        _user = authState.User;
+
+        _message = "Login required (from code)";
+        if (_user.Identity is not null && _user.Identity.IsAuthenticated)
+        {
+            _message = "You are authenticated(from code)";
+        }
+    }
+
+}
