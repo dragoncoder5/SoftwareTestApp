@@ -29,6 +29,7 @@ namespace SoftwareTestApp.Areas.Identity.Pages.Account
         private readonly IUserEmailStore<IdentityUser> _emailStore;
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailSender _emailSender;
+        private readonly IServiceProvider _ServiceProvider;
 
         public RegisterModel(
             UserManager<IdentityUser> userManager,
@@ -177,5 +178,17 @@ namespace SoftwareTestApp.Areas.Identity.Pages.Account
             }
             return (IUserEmailStore<IdentityUser>)_userStore;
         }
+
+        private async Task CreateUserRole(string user, string role)
+        {
+           var _RoleManager = _ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+
+            var userRoleCheck = await _RoleManager.RoleExistsAsync(role);
+            if (!userRoleCheck)
+                await _RoleManager.CreateAsync(new IdentityRole(role));
+            IdentityUser identityUser= await _userManager.FindByEmailAsync(user);
+            await _userManager.AddToRoleAsync(identityUser,role);
+        }
+
     }
 }
